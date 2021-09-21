@@ -36,5 +36,10 @@ elif [ "$die2" -gt 20 ]
 then
  die2=$((20))
 fi
+
+diceSum=$((die1 + die2))
+diceAvg=$((diceSum/2))
 # display the results
 echo "Rolled $die1, $die2"
+echo "Die 1 plus Die 2 = $diceSum"
+echo "The average is $diceAvg"
