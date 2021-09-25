@@ -18,9 +18,7 @@
 echo "Setuid files:"
 echo "============="
 find / -type f -executable -perm -4000 -ls 2>/dev/null | sort -k 5
-#echo "12 Largest Files in System (ls)"
-#echo "=========================="
-#ls -laSRh / 2>/dev/null | grep '^-' | sort -k 5 -rn | head -n 12 #| awk '{print $4,$5,$9}' 
+
 echo "12 Largest Files in System"
 echo "=========================="
 
@@ -32,8 +30,9 @@ echo "=========================="
 #sorting in reverse so largest files are on top, and again in human readable format.
 #using head to show only the top 12 results
 #finally using awk to only show the 4th 5th and 9th column to only show owner file size and the file name
- 
-find / -type f -size +1M -exec ls -lah {} + 2>/dev/null | sort -rh | head -n 12 | awk '{print$4,$5,$9}'
+
+#EDIT: Changed the sort command to sort by the file size(key=column 5) Looks better now. 
+find / -type f -size +1M -exec ls -lah {} + 2>/dev/null | sort -hr -k 5 | head -n 12 | awk '{print$4,$5,$9}'
 
 
 
