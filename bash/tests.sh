@@ -22,7 +22,9 @@ test -x /etc/resolv.conf && echo "/etc/resolv.conf is executable" || echo "/etc/
 # TASK 5: Add a test to see if the /tmp directory is writable
 # TASK 6: Add a test to see if the /tmp directory can be accessed
 [ -d /tmp ] && echo "/tmp is a directory" || echo "/tmp is not a directory"
-
+[ -r /tmp ] && echo "/tmp is readable" || echo "/tmp is not readable"
+[ -w /tmp ] && echo "/tmp is writable" || echo "/tmp is not writable"
+[ -x /tmp ] && echo "/tmp can be accessed" || echo "/tmp can not be accessed"
 # Tests if one file is newer than another
 # TASK 7: Add testing to print out which file newest, or if they are the same age
 [ /etc/hosts -nt /etc/resolv.conf ] && echo "/etc/hosts is newer than /etc/resolv.conf"
