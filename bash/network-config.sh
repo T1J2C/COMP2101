@@ -82,8 +82,8 @@ lanAdd=$(ip a s $(ip a |awk '/: e/{gsub(/:/,"");print $2}')|awk '/inet /{gsub(/\
 lanHost=$(getent hosts $lanAdd | awk '{print $2}' ) #using the lanAdd made this line much shorter and cleaner.
 extIP=$(curl -s icanhazip.com) #external IP to be stored for later use
 extName=$(getent hosts $extIP | awk '{print $2}') #reused external IP in this command
-
-
+routerAdd=$(ip r | awk '{print $3}' | awk 'NR==1')
+routerName=$(getent hosts $routerAdd | awk '{print $2}')
 #   ============
 #  |   Output   |
 #   ============
@@ -93,5 +93,7 @@ LAN Address     : $lanAdd
 LAN Hostname    : $lanHost
 External IP     : $extIP
 External Name   : $extName
+Router Address	: $routerAdd
+Router Hostname	: $routerName
 EOF
 
