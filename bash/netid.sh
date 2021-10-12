@@ -58,7 +58,7 @@ done
 #####
 # Once per host report
 #####
-if [ "$intOption" != "on" ]; then
+if [[ "$intOption" != "on" || "$vOption" == "on" ]]; then
   [ "$verbose" = "yes" ] && echo "Gathering host information"
   # we use the hostname command to get our system name
   my_hostname=$(hostname)
@@ -138,20 +138,46 @@ fi
 #####
 
 
-####################
-#List of Interfaces#
-####################
+########################################
+#                                      #
+#   Dynamically find Interfaces Task   #
+#                                      #
+########################################
+
 ints=$(ip -o addr | grep -v 'lo' | awk '{print $2}')
 
-cat <<EOF
-List of Interfaces
-==================
+intArray=($ints)
+
+for ifaces in ${intArray[@]}; do
+
+    if [ "$intOption" != "on" ]; then
+
+      [ "$verbose" = "yes" ] && echo "Reporting on interface(s): $interface"
+
+      [ "$verbose" = "yes" ] && echo "Getting IPV4 address and name for interface $interface"
+      # Find an address and hostname for the interface being summarized
+      # we are assuming there is only one IPV4 address assigned to this interface
+      ipv4_address=$(ip a s $ifaces|awk -F '[/ ]+' '/inet /{print $3}')
+      ipv4_hostname=$(getent hosts $ipv4_address | awk '{print $2}')
+
+      [ "$verbose" = "yes" ] && echo "Getting IPV4 network block info and name for interface $interface"
+      # Identify the network number for this interface and its name if it has one
+      # Some organizations have enough networks that it makes sense to name them just like how we name hosts
+      # To ensure your network numbers have names, add them to your /etc/networks file, one network to a line, as   networkname networknumber
+      #   e.g. grep -q mynetworknumber /etc/networks || (echo 'mynetworkname mynetworknumber' |sudo tee -a /etc/networks)
+      network_address=$(ip route list dev $ifaces scope link|cut -d ' ' -f 1)
+      network_number=$(cut -d / -f 1 <<<"$network_address")
+      network_name=$(getent networks $network_number|awk '{print $1}')
+
+  cat <<EOF
+
+Interface $ifaces:
+===============
+Address         : $ipv4_address
+Name            : $ipv4_hostname
+Network Address : $network_address
+Network Name    : $network_name
+
 EOF
-
-interfaceArray=()
-for intNumber in $ints; do
-
-	interfaceArray+=("$ints")
+    fi
 done
-echo ${interfaceArray[@]}
-
