@@ -136,3 +136,22 @@ fi
 #####
 # End of per-interface report
 #####
+
+
+####################
+#List of Interfaces#
+####################
+ints=$(ip -o addr | grep -v 'lo' | awk '{print $2}')
+
+cat <<EOF
+List of Interfaces
+==================
+EOF
+
+interfaceArray=()
+for intNumber in $ints; do
+
+	interfaceArray+=("$ints")
+done
+echo ${interfaceArray[@]}
+
