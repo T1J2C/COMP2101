@@ -15,21 +15,26 @@
 # Usage:
 #   error-message ["some text to print to stderr"]
 function error-message {
+
   echo "Invalid input was entered" >&2
 }
+
 
 # This function will send a message to stderr and exit with a failure status
 # Usage:
 #   error-exit ["some text to print to stderr" [exit-status]]
 function error-exit {
-
+  echo "$1 ,try:"
+  displayhelp
   exit 1
 
 }
 #This function displays help information if the user asks for it on the command line or gives us a bad command line
 function displayhelp {
+
   echo "[-h|--help][--host][--domain][--ipconfig][--os]"
   echo "[--cpu][--memory][--disk][--printer]"
+  exit 1
 }
 
 # This function will remove all the temp files created by the script
@@ -61,7 +66,6 @@ while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
       displayhelp
-      error-exit
       ;;
     --host)
       hostnamewanted=true
