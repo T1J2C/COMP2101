@@ -1,31 +1,35 @@
-﻿$totalRAM = 0
-$horizontal = 0
-$vertical = 0
+﻿
 
+
+function sysHardware {
 "
 System Hardware:
 ==============="
-Get-WmiObject -Class win32_computersystem | 
-Format-list Description
+    Get-WmiObject -Class win32_computersystem | 
+    Format-list Description
+}
+sysHardware
 
-
+function opSystem {
 "Operating System:
 =================="
-Get-WmiObject -Class win32_operatingsystem |
-    foreach {
-        new-object -TypeName psobject -Property @{
-            Name = $_.name
-            Version = $_.Version
-        }
-    } | 
-    format-list Name, Version
+    Get-WmiObject -Class win32_operatingsystem |
+        foreach {
+         new-object -TypeName psobject -Property @{
+                Name = $_.name
+                Version = $_.Version
+            }
+     } | 
+     format-list Name, Version
+}
+opSystem
 
 
-            
+function processor {            
 "Processor:
 ==========="
 Get-WmiObject -Class win32_processor |
-    foreach {
+      foreach {
         new-object -TypeName psobject -Property @{
             Description = $_.Description
             "L1 Cache Size(KB)" = $_.L1CacheSize/1KB
@@ -35,14 +39,18 @@ Get-WmiObject -Class win32_processor |
             Speed = $_.MaxClockSpeed
         }
     } | 
-    Format-list Description, "L1 Cache Size(KB)", "L2 Cache Size(KB)", "L3 Cache Size(KB)", Cores, Speed
+        Format-list Description, "L1 Cache Size(KB)", "L2 Cache Size(KB)", "L3 Cache Size(KB)", Cores, Speed
+}
+processor
 
-            
+
+function physMem { 
+    $totalRAM = 0         
 "Physical Memory:
 ================="
 #Physical Memory, retrieves Description, Manufacturer, Capacity and Bank of RAM
-Get-WmiObject -Class win32_physicalmemory |
-    foreach {
+    Get-WmiObject -Class win32_physicalmemory |
+        foreach {
         new-object -TypeName psobject -Property @{
             Description = $_.Description
             Vendor = $_.Manufacturer
@@ -51,16 +59,21 @@ Get-WmiObject -Class win32_physicalmemory |
         }
         $totalRAM += $_.capacity/1mb
     } |
-    Format-table -AutoSize Descripton, Vendor, "Size(MB)", Bank
+        Format-table -AutoSize Descripton, Vendor, "Size(MB)", Bank
 
 "Total RAM: ${totalRAM}MB"
+}
+physMem
+ 
+ 
     
-
-"Physical Disk Drives:
+function physDiskDrive {
+"
+Physical Disk Drives:
 ======================"
-$diskdrives = Get-CimInstance CIM_diskdrive
+    $diskdrives = Get-CimInstance CIM_diskdrive
 
-    foreach ($disk in $diskdrives) {
+     foreach ($disk in $diskdrives) {
         $partitions = $disk | Get-CimAssociatedInstance -ResultClassName CIM_diskpartition
         foreach ($partition in $partitions) {
             $logicaldisks = $partition | Get-CimAssociatedInstance -ResultClassName CIM_logicaldisk
@@ -76,20 +89,28 @@ $diskdrives = Get-CimInstance CIM_diskdrive
                 
             }
         }
+}
+physDiskDrive
     
-    
+ 
+ 
+function netAdaptConf {   
 "Network Adapter Config:
 ========================"
 #Get-CIMInstance to retrieve network adapter info, only showing ip enabled adapters, selecting only the Description, Index, IP Address, Subnet mask, dns domain and the dns server(not found as a property?), finally formatting as a table and auotsizing.
-get-ciminstance win32_networkadapterconfiguration | where-object ipenabled | Select-Object Description, Index, IPAddress, IPSubnet, DNSDomain, DNSServer |format-table -autosize
+    get-ciminstance win32_networkadapterconfiguration | where-object ipenabled | Select-Object Description, Index, IPAddress, IPSubnet, DNSDomain, DNSServer |format-table -autosize
+}
+netAdaptConf
 
 
 
-
+function vidCard {
+    $horizontal = 0
+    $vertical = 0
 "Video Card:
 ============"
-Get-WmiObject -Class win32_videocontroller |
-    foreach {
+    Get-WmiObject -Class win32_videocontroller |
+        foreach {
         new-object -TypeName psobject -Property @{
             Vendor = $_.Name
             Description = $_.Description
@@ -97,5 +118,7 @@ Get-WmiObject -Class win32_videocontroller |
         $horizontal += $_.CurrentHorizontalResolution
         $vertical += $_.CurrentVerticalResolution
     } |
-    Format-list Vendor, Description
+        Format-list Vendor, Description
 "Current Screen Resolution: $horizontal x $vertical"
+}
+vidCard
